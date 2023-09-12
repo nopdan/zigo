@@ -105,9 +105,9 @@ func (c *Config) List() {
 func (c *Config) Use(version string) {
 	if slices.Contains(c.versions, version) {
 		c.link(version)
-		c.Current = version
 		c.write()
 		fmt.Printf("using %s\n", version)
+		c.Current = version
 		return
 	}
 	info := newInfo(version)
@@ -115,15 +115,15 @@ func (c *Config) Use(version string) {
 		info.download()
 		info.install(c.ZigDIR)
 	}
-	c.link(info.Version)
-	c.Current = version
-	if version == "master" {
-		c.Master = info.Version
+	if len(info.data) == 0 {
 		fmt.Printf("using master => %s\n", info.Version)
-	} else {
-		fmt.Printf("using %s\n", info.Version)
+	}
+	c.link(info.Version)
+	if info.IsMaster {
+		c.Master = info.Version
 	}
 	c.write()
+	c.Current = version
 }
 
 func (c *Config) Remove(version string) {
@@ -145,10 +145,12 @@ func (c *Config) Remove(version string) {
 		os.Exit(1)
 	}
 	if version == "master" {
+		fmt.Printf("removed master => %s\n", c.Master)
 		c.Master = ""
+	} else {
+		fmt.Printf("removed %s\n", version)
 	}
 	c.write()
-	fmt.Printf("removed %s\n", version)
 }
 
 func (c *Config) write() {

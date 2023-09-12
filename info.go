@@ -17,6 +17,7 @@ import (
 )
 
 type Info struct {
+	IsMaster bool
 	Version  string
 	URL      string
 	Shasum   string
@@ -52,7 +53,8 @@ func newInfo(version string) *Info {
 	info := new(Info)
 	info.Version = version
 	// master version
-	if v["version"] != nil {
+	if version == "master" {
+		info.IsMaster = true
 		info.Version = v["version"].(string)
 	}
 
@@ -89,6 +91,11 @@ func getDistInfo() string {
 }
 
 func (info *Info) install(ZigDIR string) {
+	if info.IsMaster {
+		fmt.Printf("installing master => %s\n", info.Version)
+	} else {
+		fmt.Printf("installing %s\n", info.Version)
+	}
 	// detect format and delete filename's extension
 	var format archiver.Extractor
 	if strings.HasSuffix(info.FileName, ".zip") {
@@ -106,7 +113,6 @@ func (info *Info) install(ZigDIR string) {
 	err := format.Extract(context.Background(), r, nil, func(ctx context.Context, f archiver.File) error {
 		subName := strings.TrimPrefix(f.NameInArchive, info.FileName)
 		name := filepath.Join(ZigDIR, info.Version, subName)
-		fmt.Println(name)
 		if f.IsDir() {
 			return os.MkdirAll(name, 0755)
 		}
@@ -128,4 +134,5 @@ func (info *Info) install(ZigDIR string) {
 		os.RemoveAll(filepath.Join(ZigDIR, info.Version))
 		panic(err)
 	}
+	fmt.Printf("successfully installed\n")
 }
