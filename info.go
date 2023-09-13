@@ -133,7 +133,8 @@ func (info *Info) install(ZigDIR string) {
 	// Extract the archive using the detected format
 	err := format.Extract(context.Background(), r, nil, func(ctx context.Context, f archiver.File) error {
 		// Create the full path for the extracted file or directory
-		subName := strings.TrimPrefix(f.NameInArchive, info.FileName)
+		tmp := strings.Split(f.NameInArchive, "/")
+		subName := strings.Join(tmp[1:], "/")
 		name := filepath.Join(ZigDIR, info.Version, subName)
 		if f.IsDir() {
 			return os.MkdirAll(name, 0755)
