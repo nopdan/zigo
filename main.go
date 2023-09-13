@@ -13,25 +13,32 @@ func main() {
 
 	c := NewConfig()
 	switch os.Args[1] {
+	case "use":
+		if len(os.Args) < 3 {
+			fmt.Printf("usage: %s use <version>\n", os.Args[0])
+			fmt.Println("you can use 'ls' or 'list' to list all installed versions")
+			return
+		}
+		c.Use(os.Args[2])
 	case "list", "ls":
 		c.List()
 	case "remove", "rm":
 		if len(os.Args) < 3 {
-			fmt.Println("usage: ", os.Args[0], "remove <version>")
+			fmt.Printf("usage: %s remove <version>\n", os.Args[0])
 			fmt.Println("you can use 'ls' or 'list' to list all installed versions")
 			return
 		}
 		c.Remove(os.Args[2])
 	case "move", "mv":
 		if len(os.Args) < 3 {
-			fmt.Println("current install dir is: ", c.ZigDIR)
+			fmt.Printf("current install dir is: %s", c.ZigDIR)
 			return
 		}
 		c.Move(os.Args[2])
 	case "help", "-h":
 		help()
 	default:
-		c.Use(os.Args[1])
+		c.Update(os.Args[1])
 	}
 }
 
@@ -42,6 +49,7 @@ func help() {
 	fmt.Printf("  %-22s Download the specified version of zig compiler and set it as default\n", "zigo <version>")
 	fmt.Println()
 	fmt.Printf("Sub Commands:\n")
+	fmt.Printf("  %-22s Set the specific installed version as default\n", "use, use <version>")
 	fmt.Printf("  %-22s List installed compiler versions\n", "list, ls")
 	fmt.Printf("  %-22s Remove the specified compiler\n", "remove, rm <version>")
 	fmt.Printf("  %-22s Move the zig installation directory\n", "move, mv <install dir>")

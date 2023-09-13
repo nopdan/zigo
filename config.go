@@ -114,7 +114,7 @@ func (c *Config) List() {
 	}
 }
 
-// Use changes the current compiler version.
+// Update changes the current compiler version.
 // If the specified version is already in the list of available versions,
 // it links the version, sets it as the current version,
 // and writes the updated configuration.
@@ -122,7 +122,7 @@ func (c *Config) List() {
 // downloads and installs the version if necessary,
 // and links the version.
 // Finally, it sets the current version and writes the updated configuration.
-func (c *Config) Use(version string) {
+func (c *Config) Update(version string) {
 	// Check if the specified version is in the list of available versions
 	if slices.Contains(c.versions, version) {
 		c.link(version)
@@ -151,6 +151,27 @@ func (c *Config) Use(version string) {
 	}
 	c.Current = version
 	c.write()
+}
+
+// Use set the specific installed version as default.
+func (c *Config) Use(version string) {
+	specific := version
+	if specific == "master" {
+		specific = c.Master
+	}
+	// Check if the specified version is in the list of available versions
+	if !slices.Contains(c.versions, specific) {
+		fmt.Printf("version: %s not found\n", specific)
+		os.Exit(1)
+	}
+	c.link(specific)
+	c.Current = version
+	c.write()
+	if version == "master" {
+		fmt.Printf("using master => %s\n", c.Master)
+	} else {
+		fmt.Printf("using %s\n", version)
+	}
 }
 
 // Remove the specified version of the compilers.

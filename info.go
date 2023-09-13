@@ -114,17 +114,15 @@ func (info *Info) install(ZigDIR string) {
 		fmt.Printf("installing %s\n", info.Version)
 	}
 
-	// Detect the format of the archive and remove the file extension
+	// Detect the format of the archive
 	var format archiver.Extractor
 	if strings.HasSuffix(info.FileName, ".zip") {
 		format = archiver.Zip{}
-		info.FileName = strings.TrimSuffix(info.FileName, ".zip")
 	} else {
 		format = archiver.CompressedArchive{
 			Compression: archiver.Xz{},
 			Archival:    archiver.Tar{},
 		}
-		info.FileName = strings.TrimSuffix(info.FileName, ".tag.xz")
 	}
 
 	// Create a reader for the archive data
@@ -134,8 +132,10 @@ func (info *Info) install(ZigDIR string) {
 	err := format.Extract(context.Background(), r, nil, func(ctx context.Context, f archiver.File) error {
 		// Create the full path for the extracted file or directory
 		tmp := strings.Split(f.NameInArchive, "/")
-		subName := strings.Join(tmp[1:], "/")
-		name := filepath.Join(ZigDIR, info.Version, subName)
+		if len(tmp) < 2 {
+			return fmt.Errorf("invalid file name: %s", f.NameInArchive)
+		}
+		name := filepath.Join(ZigDIR, info.Version, strings.Join(tmp[1:], "/"))
 		if f.IsDir() {
 			return os.MkdirAll(name, 0755)
 		}

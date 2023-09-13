@@ -36,6 +36,10 @@ successfully installed
 0.12.0-dev.352+4d29b3967
 ```
 
+### `zigo use <version>`
+
+Set the specific installed version as the default.
+
 ### `zigo ls`
 
 List installed compiler versions.
