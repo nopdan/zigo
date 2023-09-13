@@ -1,5 +1,11 @@
 # zigo
 
+![Actions Check](https://badgen.net/github/checks/nopdan/zigo)
+[![Stars](https://badgen.net/github/stars/nopdan/zigo)](https://github.com/nopdan/zigo/stargazers)
+![Downloads](https://badgen.net/github/assets-dl/nopdan/zigo)
+![License](https://badgen.net/github/license/nopdan/zigo)
+[![Release](https://badgen.net/github/release/nopdan/zigo)](https://github.com/studyzy/studyzy/releases)
+
 Download and manage Zig compilers.
 
 `zigo` is a dependency free binary program.
