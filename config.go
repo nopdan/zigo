@@ -227,7 +227,7 @@ func (c *Config) Move(dir string) {
 	// Link the appropriate directory based on the current branch
 	if c.Current == "master" {
 		c.link(c.Master)
-	} else {
+	} else if c.Current != "" {
 		c.link(c.Current)
 	}
 }
