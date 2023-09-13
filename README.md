@@ -1,17 +1,45 @@
 # zigo
 
-GO 语言写的一个 zig 版本管理工具。
+`zigo` 是用 golang 写的一个 [zig](https://ziglang.org/) 版本管理工具。
 
-灵感来自 [zigup](https://github.com/marler8997/zigup), [zvm](https://github.com/tristanisham/zvm), [scoop](https://github.com/ScoopInstaller/Scoop)
+`zigo` 是一个无依赖的二进制文件。
 
-zigo 使用 [grab](https://github.com/cavaliergopher/grab) 下载文件到内存中
+- 使用 [grab](https://github.com/cavaliergopher/grab) 下载文件。
+- 使用 [archiver](https://github.com/mholt/archiver) 解压 `.tar.xz` 和 `.zip` 文件。
 
-zigo 不依赖 `tar`，而是用 [archiver](https://github.com/mholt/archiver) 解压 `.tar.xz` 和 `.zip` 文件。
+> 灵感来自 [zigup](https://github.com/marler8997/zigup), [zvm](https://github.com/tristanisham/zvm), [scoop](https://github.com/ScoopInstaller/Scoop)
 
-TODO:
+## 使用
 
-- [ ] 通过命令行修改 `install-dir`，并移动文件夹内容，重新链接 `current`
-- [ ] github action
+### `zigo <version>`
+
+下载指定版本的 zig 编译器，并设为默认值。
+
+examples: `zigo 0.11.0`, `zigo master`
+
+### `zigo ls`
+
+列出所有已安装的版本。
+
+```sh
+❯ zigo ls
+* master => 0.12.0-dev.312+cb6201715
+  0.11.0
+  0.12.0-dev.307+7827265ea
+  0.12.0-dev.312+cb6201715
+```
+
+### `zigo rm <version>`
+
+删除指定的版本。
+
+### `zigo mv <install-dir>`
+
+移动 zig 安装路径，默认安装路径是 `~/.zig`。
+
+### `zigo -h`
+
+打印帮助信息。
 
 ## 编译
 
@@ -22,19 +50,3 @@ git clone https://github.com/nopdan/zigo.git
 cd zigo
 go build
 ```
-
-## 使用
-
-```sh
-Root Command:
-  zigo <version>         download and set the compiler as default
-
-Sub Commands:
-  list, ls               list installed compiler versions
-  remove, rm <version>   remove compiler
-  help, -h
-```
-
-## 配置
-
-zigo 的配置文件在 `~/.config/zigo.json`，你可以修改其中的 `install-dir` 改变安装路径，默认安装路径是 `~/.zig`
