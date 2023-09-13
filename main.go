@@ -49,9 +49,9 @@ func help() {
 	fmt.Printf("  %-22s Download the specified version of zig compiler and set it as default\n", "zigo <version>")
 	fmt.Println()
 	fmt.Printf("Sub Commands:\n")
-	fmt.Printf("  %-22s Set the specific installed version as default\n", "use, use <version>")
-	fmt.Printf("  %-22s List installed compiler versions\n", "list, ls")
-	fmt.Printf("  %-22s Remove the specified compiler\n", "remove, rm <version>")
-	fmt.Printf("  %-22s Move the zig installation directory\n", "move, mv <install dir>")
+	fmt.Printf("  %-22s Set the specific installed version as default\n", "use <version>")
+	fmt.Printf("  %-22s List installed compiler versions\n", "ls, list")
+	fmt.Printf("  %-22s Remove the specified compiler\n", "rm, remove <version>")
+	fmt.Printf("  %-22s Move the zig installation directory\n", "mv, move <directory>")
 	fmt.Printf("  %-22s Print help message\n", "help, -h")
 }
