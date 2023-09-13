@@ -106,7 +106,7 @@ func getDistInfo() string {
 	return arch + "-" + os
 }
 
-// install the specified version of Zig to the given Zig directory.
+// Install the specified version of Zig to the given Zig directory.
 func (info *Info) install(ZigDIR string) {
 	if info.IsMaster {
 		fmt.Printf("installing master => %s\n", info.Version)

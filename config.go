@@ -211,7 +211,7 @@ func (c *Config) Move(dir string) {
 	}
 }
 
-// save the configuration to the zigo.json file.
+// Save the configuration to the zigo.json file.
 func (c *Config) write() {
 	// Marshal the configuration into JSON format.
 	data, err := json.MarshalIndent(c, "", "  ")
@@ -228,7 +228,7 @@ func (c *Config) write() {
 	}
 }
 
-// link "dir" to "current"
+// Link "dir" to "current"
 func (c *Config) link(dir string) {
 	// Remove the existing symlink
 	os.RemoveAll(filepath.Join(c.ZigDIR, "current"))

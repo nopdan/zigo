@@ -10,7 +10,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-// download a file from a given URL and verifies its integrity using SHA256 checksum.
+// Download a file from a given URL and verifies its integrity using SHA256 checksum.
 func (i *Info) download() {
 	client := grab.NewClient()
 	req, _ := grab.NewRequest("", i.URL)
