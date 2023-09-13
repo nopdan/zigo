@@ -44,7 +44,7 @@ func main() {
 
 // Print help message
 func help() {
-	fmt.Printf("zigo v1.0 (Download and manage Zig compilers)\n\n")
+	fmt.Printf("zigo v1.1 (Download and manage Zig compilers)\n\n")
 	fmt.Printf("Root Command:\n")
 	fmt.Printf("  %-22s Download the specified version of zig compiler and set it as default\n", "zigo <version>")
 	fmt.Println()
