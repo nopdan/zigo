@@ -2,9 +2,15 @@
 
 Download and manage Zig compilers.
 
-`Zigo` is a dependency free binary program.
+`zigo` is a dependency free binary program.
 
 > Inspired by [zigup](https://github.com/marler8997/zigup), [zvm](https://github.com/tristanisham/zvm), [scoop](https://github.com/ScoopInstaller/Scoop)
+
+## Install
+
+- Download from [releases](https://github.com/nopdan/zigo/releases/).  
+
+- From source: `go install github.com/nopdan/zigo@latest`
 
 ## Usage
 
