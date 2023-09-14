@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"slices"
 )
@@ -209,6 +210,15 @@ func (c *Config) Remove(version string) {
 		fmt.Printf("removed %s\n", version)
 	}
 	c.write()
+}
+
+// Clean up unused dev version compilers.
+func (c *Config) Clean() {
+	for _, version := range c.versions {
+		if strings.Contains(version, "dev") && version != c.Master {
+			c.Remove(version)
+		}
+	}
 }
 
 // Move zig install directory to the specified location.

@@ -14,9 +14,17 @@ Download and manage Zig compilers.
 
 ## Install
 
-- Download from [releases](https://github.com/nopdan/zigo/releases/).  
+- Download from [releases](https://github.com/nopdan/zigo/releases/).
+
+```sh
+unzip ./zigo-linux-amd64.zip
+chmod +x zigo
+./zigo
+```
 
 - From source: `go install github.com/nopdan/zigo@latest`
+
+Add `~/.zig/current` to the environment variable.
 
 ## Usage
 
@@ -27,12 +35,12 @@ Download the specified version of zig compiler and set it as default.
 examples: `zigo 0.11.0`, `zigo master`
 
 ```sh
-❯ zigo master
+❯ ./zigo master
 Downloading https://ziglang.org/builds/zig-windows-x86_64-0.12.0-dev.352+4d29b3967.zip...
 100% |███████████████████████████████████████████████████████████████| (74/74 MB, 16 MB/s)
 installing master => 0.12.0-dev.352+4d29b3967
 successfully installed
-❯ zig version
+❯ ./zig version
 0.12.0-dev.352+4d29b3967
 ```
 
@@ -45,7 +53,7 @@ Set the specific installed version as the default.
 List installed compiler versions.
 
 ```sh
-❯ zigo ls
+❯ ./zigo ls
 * master => 0.12.0-dev.312+cb6201715
   0.11.0
   0.12.0-dev.307+7827265ea
@@ -57,8 +65,28 @@ List installed compiler versions.
 Remove the specified compiler.
 
 ```sh
-❯ zigo rm 0.10.1
+❯ ./zigo rm 0.10.1
 removed 0.10.1
+```
+
+### `zigo clean`
+
+Clean up unused dev version compilers.
+
+```sh
+❯ ./zigo ls
+* master => 0.12.0-dev.353+4a44b7993
+  0.11.0
+  0.12.0-dev.312+cb6201715
+  0.12.0-dev.352+4d29b3967
+  0.12.0-dev.353+4a44b7993
+❯ ./zigo clean
+removed 0.12.0-dev.312+cb6201715
+removed 0.12.0-dev.352+4d29b3967
+❯ ./zigo ls
+* master => 0.12.0-dev.353+4a44b7993
+  0.11.0
+  0.12.0-dev.353+4a44b7993
 ```
 
 ### `zigo mv <install-dir>`
