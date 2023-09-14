@@ -11,9 +11,9 @@ import (
 )
 
 // Download a file from a given URL and verifies its integrity using SHA256 checksum.
-func (i *Info) download() {
+func (info *Info) download() {
 	client := grab.NewClient()
-	req, _ := grab.NewRequest("", i.URL)
+	req, _ := grab.NewRequest("", info.URL)
 	req.NoStore = true // don't store the downloaded file
 
 	// Start download
@@ -42,14 +42,14 @@ Loop:
 	}
 
 	// Verify sha256 checksum
-	if i.Shasum == "" {
+	if info.Shasum == "" {
 		return
 	}
-	i.data, _ = resp.Bytes()
+	info.data, _ = resp.Bytes()
 	h := sha256.New()
-	h.Write(i.data)
-	if fmt.Sprintf("%x", h.Sum(nil)) != i.Shasum {
-		fmt.Printf("sha256 mismatch. want: %s, got: %x\n", i.Shasum, h.Sum(nil))
+	h.Write(info.data)
+	if fmt.Sprintf("%x", h.Sum(nil)) != info.Shasum {
+		fmt.Printf("sha256 mismatch. want: %s, got: %x\n", info.Shasum, h.Sum(nil))
 		os.Exit(1)
 	}
 }

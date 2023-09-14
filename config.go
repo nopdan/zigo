@@ -115,42 +115,32 @@ func (c *Config) List() {
 	}
 }
 
-// Update changes the current compiler version.
-// If the specified version is already in the list of available versions,
-// it links the version, sets it as the current version,
-// and writes the updated configuration.
-// If the version is not in the list, it creates a new info object,
-// downloads and installs the version if necessary,
-// and links the version.
-// Finally, it sets the current version and writes the updated configuration.
-func (c *Config) Update(version string) {
-	// Check if the specified version is in the list of available versions
+// Install the specified version of the application.
+// If the version is already installed, it is set as the current version,
+// if not, it is downloaded, installed, and set as the current version.
+func (c *Config) Install(version string) {
+	// Check if the specified version is in the list of installed versions
 	if slices.Contains(c.versions, version) {
-		c.link(version)
-		fmt.Printf("using %s\n", version)
-		c.Current = version
-		c.write()
+		c.Use(version)
 		return
 	}
 
-	info := newInfo(version)
-	// Check if the specified version is not in the list of available versions
-	if !slices.Contains(c.versions, info.Version) {
-		// Download and install the version
-		info.download()
-		info.install(c.ZigDIR)
+	// Get the version info from url
+	info := NewInfo(version)
+	// No update on master
+	if info.IsMaster && slices.Contains(c.versions, info.Version) {
+		c.Master = info.Version
+		c.Use("master")
+		return
 	}
 
-	// Without download
-	if info.data == nil {
-		// Print the message indicating the master version being used
-		fmt.Printf("using master => %s\n", info.Version)
-	}
+	// Download and install to ZigDIR
+	info.Install(c.ZigDIR)
 	c.link(info.Version)
+	c.Current = version
 	if info.IsMaster {
 		c.Master = info.Version
 	}
-	c.Current = version
 	c.write()
 }
 

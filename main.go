@@ -40,7 +40,7 @@ func main() {
 	case "help", "-h":
 		help()
 	default:
-		c.Update(os.Args[1])
+		c.Install(os.Args[1])
 	}
 }
 

@@ -47,10 +47,10 @@ func getIndex() map[string]map[string]interface{} {
 	return res
 }
 
-// newInfo returns a new Info instance based on the provided version.
+// NewInfo returns a new Info instance based on the provided version.
 // It retrieves the information from an index, validates the version,
 // and populates the Info struct with the relevant data.
-func newInfo(version string) *Info {
+func NewInfo(version string) *Info {
 	// Check if the version exists in the index
 	index := getIndex()
 	v, ok := index[version]
@@ -106,8 +106,9 @@ func getDistInfo() string {
 	return arch + "-" + os
 }
 
-// Install the specified version of Zig to the given Zig directory.
-func (info *Info) install(ZigDIR string) {
+// Download and Install the specified version of Zig to the given Zig directory.
+func (info *Info) Install(ZigDIR string) {
+	info.download()
 	if info.IsMaster {
 		fmt.Printf("installing master => %s\n", info.Version)
 	} else {
