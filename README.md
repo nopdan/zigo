@@ -4,7 +4,7 @@
 [![Stars](https://badgen.net/github/stars/nopdan/zigo)](https://github.com/nopdan/zigo/stargazers)
 ![Downloads](https://badgen.net/github/assets-dl/nopdan/zigo)
 ![License](https://badgen.net/github/license/nopdan/zigo)
-[![Release](https://badgen.net/github/release/nopdan/zigo)](https://github.com/studyzy/studyzy/releases)
+[![Release](https://badgen.net/github/release/nopdan/zigo)](https://github.com/nopdan/zigo/releases)
 
 Download and manage Zig compilers.
 
@@ -18,7 +18,7 @@ Download and manage Zig compilers.
 
 ```sh
 unzip ./zigo-linux-amd64.zip
-chmod +x zigo
+chmod +x ./zigo
 ./zigo
 ```
 
@@ -40,7 +40,7 @@ Downloading https://ziglang.org/builds/zig-windows-x86_64-0.12.0-dev.352+4d29b39
 100% |███████████████████████████████████████████████████████████████| (74/74 MB, 16 MB/s)
 installing master => 0.12.0-dev.352+4d29b3967
 successfully installed
-❯ ./zig version
+❯ zig version
 0.12.0-dev.352+4d29b3967
 ```
 
