@@ -186,6 +186,11 @@ func (c *Config) Remove(version string) {
 	}
 
 	// Remove the version directory
+	if version == "master" {
+		fmt.Printf("removing master => %s... ", c.Master)
+	} else {
+		fmt.Printf("removing %s... ", version)
+	}
 	err := os.RemoveAll(dir)
 	if err != nil {
 		fmt.Println(err)
@@ -194,10 +199,25 @@ func (c *Config) Remove(version string) {
 
 	// Update the master version if the master version was removed
 	if version == "master" {
-		fmt.Printf("removed master => %s\n", c.Master)
 		c.Master = ""
-	} else {
-		fmt.Printf("removed %s\n", version)
+	}
+	fmt.Println("done.")
+	c.write()
+}
+
+// Remove all installed compilers.
+func (c *Config) RemoveAll() {
+	yes := []string{"y", "Y", "yes", "Yes"}
+	var input string
+	fmt.Printf("Are you sure you want to delete all compilers? (Yes/No): ")
+	fmt.Scanf("%s", &input)
+	if !slices.Contains(yes, input) {
+		return
+	}
+	c.Current = ""
+	c.Master = ""
+	for _, version := range c.versions {
+		c.Remove(version)
 	}
 	c.write()
 }

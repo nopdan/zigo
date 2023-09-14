@@ -68,6 +68,9 @@ Remove the specified compiler.
 ❯ ./zigo rm 0.10.1
 removed 0.10.1
 ```
+### `zigo rma`
+
+Remove all installed compilers.
 
 ### `zigo clean`
 
