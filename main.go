@@ -55,6 +55,6 @@ func help() {
 	fmt.Printf("  %-22s List installed compiler versions\n", "ls, list")
 	fmt.Printf("  %-22s Remove the specified compiler\n", "rm, remove <version>")
 	fmt.Printf("  %-22s Clean up unused dev version compilers\n", "clean")
-	fmt.Printf("  %-22s Move the zig installation directory\n", "mv, move <directory>")
+	fmt.Printf("  %-22s Move the zig installation directory\n", "mv, move <install-dir>")
 	fmt.Printf("  %-22s Print help message\n", "help, -h")
 }

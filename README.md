@@ -91,7 +91,9 @@ removed 0.12.0-dev.352+4d29b3967
 
 ### `zigo mv <install-dir>`
 
-Move the zig installation directory. Default installation directory is `~/.zig`.
+Move the zig installation directory.
+
+**Default installation directory is** `~/.zig`.
 
 ### `zigo -h`
 
