@@ -36,12 +36,13 @@ examples: `zigo 0.11.0`, `zigo master`
 
 ```sh
 ❯ ./zigo master
-Downloading https://ziglang.org/builds/zig-windows-x86_64-0.12.0-dev.352+4d29b3967.zip...
-100% |███████████████████████████████████████████████████████████████| (74/74 MB, 16 MB/s)
-installing master => 0.12.0-dev.352+4d29b3967
-successfully installed
+downloading https://ziglang.org/builds/zig-linux-x86_64-0.12.0-dev.374+742030a8f.tar.xz...
+progress:  42.96 MiB / 42.96 MiB  ( 100.0 % )  13.96 MiB/s
+done. save cache to /home/cx/.cache/zigo/zig-linux-x86_64-0.12.0-dev.374+742030a8f.tar.xz
+installing master => 0.12.0-dev.374+742030a8f...
+successfully installed!
 ❯ zig version
-0.12.0-dev.352+4d29b3967
+0.12.0-dev.374+742030a8f
 ```
 
 ### `zigo use <version>`

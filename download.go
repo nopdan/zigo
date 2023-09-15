@@ -66,7 +66,7 @@ func (info *Info) download() {
 		resp.Wait()
 		fmt.Printf("load cache from %s\n", info.FileName)
 	} else {
-		fmt.Printf("downloading %v...\n", req.URL())
+		fmt.Printf("downloading... %v\n", req.URL())
 		for !resp.IsComplete() {
 			time.Sleep(100 * time.Millisecond)
 			progress(resp)
