@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -9,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 
@@ -22,9 +20,7 @@ type Info struct {
 	URL      string // URL to download
 	Shasum   string // SHA256 checksum
 	Size     string // file size
-	FileName string //
-
-	data []byte // downloaded data
+	FileName string // file name
 }
 
 // getIndex retrieves the download index from the given URL and returns it as a map.
@@ -83,9 +79,6 @@ func NewInfo(version string) *Info {
 	info.Shasum = dist["shasum"].(string)
 	info.Size = dist["size"].(string)
 
-	// Extract the file name from the URL using a regular expression
-	re, _ := regexp.Compile("zig-.+")
-	info.FileName = re.FindString(info.URL)
 	return info
 }
 
@@ -127,10 +120,13 @@ func (info *Info) Install(ZigDIR string) {
 	}
 
 	// Create a reader for the archive data
-	r := bytes.NewReader(info.data)
+	r, err := os.Open(info.FileName)
+	if err != nil {
+		panic(err)
+	}
 
 	// Extract the archive using the detected format
-	err := format.Extract(context.Background(), r, nil, func(ctx context.Context, f archiver.File) error {
+	err = format.Extract(context.Background(), r, nil, func(ctx context.Context, f archiver.File) error {
 		// Create the full path for the extracted file or directory
 		tmp := strings.Split(f.NameInArchive, "/")
 		if len(tmp) < 2 {

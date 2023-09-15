@@ -2,13 +2,13 @@ package main
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/cavaliergopher/grab/v3"
-	"github.com/schollz/progressbar/v3"
 )
 
 // Download a file from a given URL and verifies its integrity using SHA256 checksum.
@@ -39,60 +39,75 @@ func (info *Info) download() {
 		os.MkdirAll(dir, 0755)
 	}
 
-	req, err := grab.NewRequest(dir, info.URL) // Create a new download request
+	// Create a new download request
+	req, err := grab.NewRequest(dir, info.URL)
 	if err != nil {
 		fmt.Printf("failed to create request\n")
 		panic(err)
 	}
 
+	// Verify sha256 checksum
+	if info.Shasum != "" {
+		h := sha256.New()
+		sum, err := hex.DecodeString(info.Shasum)
+		if err != nil {
+			fmt.Printf("failed to decode sha256 checksum\n")
+		} else {
+			req.SetChecksum(h, sum, true)
+		}
+	}
+
 	// Start download
 	resp := client.Do(req)
 
+	info.FileName = resp.Filename
 	// Check if the download did resume
 	if resp.DidResume {
 		resp.Wait()
-		fmt.Printf("Load cache from %s\n", filepath.Join(dir, info.FileName))
+		fmt.Printf("Load cache from %s\n", info.FileName)
 	} else {
 		fmt.Printf("Downloading %v...\n", req.URL())
-		// Start UI loop
-		t := time.NewTicker(200 * time.Millisecond)
-		defer t.Stop()
-		bar := progressbar.DefaultBytes(resp.Size())
-	Loop:
-		for {
-			select {
-			case <-t.C:
-				bar.Set64(resp.BytesComplete())
-			case <-resp.Done:
-				break Loop
-			}
+		for !resp.IsComplete() {
+			time.Sleep(100 * time.Millisecond)
+			progress(resp)
 		}
-		bar.Set64(resp.BytesComplete())
+		fmt.Println()
 	}
-
 	// Check errors
 	if err := resp.Err(); err != nil {
 		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Verify sha256 checksum
-	if info.Shasum == "" {
-		return
-	}
-	info.data, _ = resp.Bytes()
-	h := sha256.New()
-	h.Write(info.data)
-
-	// Mismatch
-	if fmt.Sprintf("%x", h.Sum(nil)) != info.Shasum {
-		fmt.Printf("sha256 mismatch. want: %s, got: %x\n", info.Shasum, h.Sum(nil))
-		// Remove downloaded file
-		os.Remove(filepath.Join(dir, info.FileName))
-		os.Exit(1)
-	}
-
 	if !resp.DidResume {
-		fmt.Printf("Save cache to %s\n", filepath.Join(dir, info.FileName))
+		fmt.Printf("Done. Save cache to %s\n", info.FileName)
 	}
+}
+
+func progress(resp *grab.Response) {
+	bytesComplete := decor(float64(resp.BytesComplete()))
+	size := decor(float64(resp.Size()))
+	bps := resp.BytesPerSecond()
+	fmt.Printf("\rProgress:  %.1f%%   %s   %s/s",
+		resp.Progress()*100,
+		fmt.Sprintf("%s / %s", bytesComplete, size),
+		decor(bps))
+}
+
+func decor(size float64) string {
+	var unit string
+	switch {
+	case size < 1024:
+		unit = "B"
+	case size < 1024*1024:
+		size /= 1024
+		unit = "KiB"
+	case size < 1024*1024*1024:
+		size /= 1024 * 1024
+		unit = "MiB"
+	default:
+		size /= 1024 * 1024 * 1024
+		unit = "GiB"
+	}
+	return fmt.Sprintf("%.2f %s", size, unit)
 }
