@@ -204,7 +204,7 @@ func (c *Config) Remove(version string, force bool) {
 
 	// If the current version is not in the list of available versions,
 	// update the current version to an empty string.
-	if !slices.Contains(versions, c.Current) {
+	if !slices.Contains(versions, c.Current) && c.Current != "master" {
 		c.Current = ""
 	}
 
@@ -212,6 +212,9 @@ func (c *Config) Remove(version string, force bool) {
 	// update the master version to an empty string.
 	if !slices.Contains(versions, c.Master) {
 		c.Master = ""
+		if c.Current == "master" {
+			c.Current = ""
+		}
 	}
 
 	// Write the changes to the config file.
