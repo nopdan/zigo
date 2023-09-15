@@ -15,8 +15,8 @@ type Config struct {
 	Current string `json:"current"`     // current version
 	Master  string `json:"master"`      // the version that master links to
 
-	versions []string // installed versions
-	zigoPath string   // zigo.json path
+	zigoPath string // zigo.json path
+	cacheDir string // cache dir
 }
 
 // NewConfig returns a new Config object.
@@ -30,6 +30,12 @@ func NewConfig() *Config {
 
 	// Create a new Config object
 	c := new(Config)
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		fmt.Printf("failed to get cache dir\n")
+		panic(err)
+	}
+	c.cacheDir = filepath.Join(cacheDir, "zigo")
 	c.zigoPath = filepath.Join(homeDir, ".config/zigo.json")
 
 	// Create zigo.json if it doesn't exist
@@ -69,27 +75,31 @@ func NewConfig() *Config {
 		}
 	}
 
-	// Get installed versions
+	return c
+}
+
+// Get installed versions
+func (c *Config) versions() []string {
 	files, err := os.ReadDir(c.ZigDIR)
 	if err != nil {
 		fmt.Printf("failed to read zig dir\n")
 		panic(err)
 	}
-	c.versions = make([]string, 0, len(files))
+	ret := make([]string, 0, len(files))
 	for _, f := range files {
 		if f.Name() == "current" {
 			continue
 		}
-		c.versions = append(c.versions, f.Name())
+		ret = append(ret, f.Name())
 	}
-
-	return c
+	return ret
 }
 
 // List prints the list of installed versions in the Config object.
 func (c *Config) List() {
 	// Check if there are no installed versions
-	if len(c.versions) == 0 {
+	verions := c.versions()
+	if len(verions) == 0 {
 		fmt.Println("no installed versions")
 		return
 	}
@@ -105,7 +115,7 @@ func (c *Config) List() {
 	}
 
 	// Print the list of installed versions
-	for _, v := range c.versions {
+	for _, v := range verions {
 		// Print the version with an asterisk if it is the current version
 		if v == c.Current {
 			fmt.Printf("* %s\n", v)
@@ -120,7 +130,8 @@ func (c *Config) List() {
 // if not, it is downloaded, installed, and set as the current version.
 func (c *Config) Install(version string) {
 	// Check if the specified version is in the list of installed versions
-	if slices.Contains(c.versions, version) {
+	versions := c.versions()
+	if slices.Contains(versions, version) {
 		c.Use(version)
 		return
 	}
@@ -128,7 +139,7 @@ func (c *Config) Install(version string) {
 	// Get the version info from url
 	info := NewInfo(version)
 	// No update on master
-	if info.IsMaster && slices.Contains(c.versions, info.Version) {
+	if info.IsMaster && slices.Contains(versions, info.Version) {
 		c.Master = info.Version
 		c.Use("master")
 		return
@@ -151,7 +162,7 @@ func (c *Config) Use(version string) {
 		specific = c.Master
 	}
 	// Check if the specified version is in the list of available versions
-	if !slices.Contains(c.versions, specific) {
+	if !slices.Contains(c.versions(), specific) {
 		fmt.Printf("version: %s not found\n", specific)
 		os.Exit(1)
 	}
@@ -166,43 +177,65 @@ func (c *Config) Use(version string) {
 }
 
 // Remove the specified version of the compilers.
-func (c *Config) Remove(version string) {
-	// Check if the specified version is the current version
-	if c.Current == version {
-		fmt.Printf("cannot remove current version\n")
-		return
+// If force is true, the version will be removed regardless of any conditions.
+// If force is false, the version will only be removed if it is not the current
+// version or the version pointed to by the master version.
+func (c *Config) Remove(version string, force bool) {
+	// If force is true, remove the version regardless of any conditions.
+	if force {
+		c.remove(version)
+	} else {
+		// Check if the version is the current version.
+		if version == c.Current {
+			fmt.Printf("cannot remove the version you are using.\n")
+			return
+		}
+		// Check if the version is the version pointed to by the master version.
+		if version == c.Master && c.Current == "master" {
+			fmt.Printf("cannot remove this version (pointed to by the master version)\n")
+			return
+		}
+
+		c.remove(version)
 	}
 
-	// Check if the specified version is the master version
-	if c.Current == "master" && c.Master == version {
-		fmt.Printf("cannot remove this version (pointed to by the master version)\n")
-		return
+	// Get the list of available versions.
+	versions := c.versions()
+
+	// If the current version is not in the list of available versions,
+	// update the current version to an empty string.
+	if !slices.Contains(versions, c.Current) {
+		c.Current = ""
 	}
 
+	// If the master version is not in the list of available versions,
+	// update the master version to an empty string.
+	if !slices.Contains(versions, c.Master) {
+		c.Master = ""
+	}
+
+	// Write the changes to the config file.
+	c.write()
+}
+
+// remove the specified version of the compilers.
+func (c *Config) remove(version string) {
 	// Determine the directory of the version to be removed
 	dir := filepath.Join(c.ZigDIR, version)
+	// Handle the special case of removing the "master" version
 	if version == "master" {
 		dir = filepath.Join(c.ZigDIR, c.Master)
-	}
-
-	// Remove the version directory
-	if version == "master" {
 		fmt.Printf("removing master => %s... ", c.Master)
 	} else {
 		fmt.Printf("removing %s... ", version)
 	}
+	// Remove the directory
 	err := os.RemoveAll(dir)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	// Update the master version if the master version was removed
-	if version == "master" {
-		c.Master = ""
-	}
 	fmt.Println("done.")
-	c.write()
 }
 
 // Remove all installed compilers.
@@ -214,19 +247,19 @@ func (c *Config) RemoveAll() {
 	if !slices.Contains(yes, input) {
 		return
 	}
-	c.Current = ""
-	c.Master = ""
-	for _, version := range c.versions {
-		c.Remove(version)
+	for _, version := range c.versions() {
+		c.Remove(version, true)
 	}
 	c.write()
 }
 
 // Clean up unused dev version compilers.
 func (c *Config) Clean() {
-	for _, version := range c.versions {
-		if strings.Contains(version, "dev") && version != c.Master {
-			c.Remove(version)
+	for _, version := range c.versions() {
+		if strings.Contains(version, "dev") &&
+			version != c.Master && version != c.Current {
+
+			c.Remove(version, false)
 		}
 	}
 }

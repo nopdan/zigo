@@ -23,14 +23,23 @@ func main() {
 	case "list", "ls":
 		c.List()
 	case "remove", "rm":
-		if len(os.Args) < 3 {
+		switch len(os.Args) {
+		case 2:
 			fmt.Printf("usage: %s remove <version>\n", os.Args[0])
 			fmt.Println("you can use 'ls' or 'list' to list all installed versions")
-			return
+		case 3:
+			if os.Args[2] == "--all" || os.Args[2] == "-a" {
+				c.RemoveAll()
+			} else {
+				c.Remove(os.Args[2], false)
+			}
+		case 4:
+			if os.Args[3] == "--force" || os.Args[3] == "-f" {
+				c.Remove(os.Args[2], true)
+			} else {
+				fmt.Printf("undefined argument: %s\n", os.Args[3])
+			}
 		}
-		c.Remove(os.Args[2])
-	case "remove-all", "rma":
-		c.RemoveAll()
 	case "clean":
 		c.Clean()
 	case "move", "mv":
@@ -55,8 +64,8 @@ func help() {
 	fmt.Printf("Sub Commands:\n")
 	fmt.Printf("  %-22s Set the specific installed version as default\n", "use <version>")
 	fmt.Printf("  %-22s List installed compiler versions\n", "ls, list")
-	fmt.Printf("  %-22s Remove the specified compiler\n", "rm, remove <version>")
-	fmt.Printf("  %-22s Remove all installed compilers\n", "rma, remove-all")
+	fmt.Printf("  %-22s Remove the specified compiler, -f means force\n", "rm <version> [-f]")
+	fmt.Printf("  %-22s Remove all installed compilers\n", "   [--all | -a]")
 	fmt.Printf("  %-22s Clean up unused dev version compilers\n", "clean")
 	fmt.Printf("  %-22s Move the zig installation directory\n", "mv, move <install-dir>")
 	fmt.Printf("  %-22s Print help message\n", "help, -h")
