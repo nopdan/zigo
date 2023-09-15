@@ -64,13 +64,19 @@ List installed compiler versions.
 
 Remove the specified compiler.
 
+Append `-f` or `--force` to force deletion.
+
+Use `zigo rm --all` or `zigo rm -a` to remove all installed compilers.
+
 ```sh
 ❯ ./zigo rm 0.10.1
 removed 0.10.1
-```
-### `zigo rma`
 
-Remove all installed compilers.
+❯ ./zigo rm 0.11.0
+cannot remove the version you are using.
+❯ ./zigo rm 0.11.0 -f
+removing 0.11.0... done.
+```
 
 ### `zigo clean`
 
