@@ -73,5 +73,7 @@ func (info *Info) download() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Save cache to %s\n", filepath.Join(dir, info.FileName))
+	if !resp.DidResume {
+		fmt.Printf("Save cache to %s\n", filepath.Join(dir, info.FileName))
+	}
 }
