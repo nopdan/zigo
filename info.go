@@ -103,9 +103,9 @@ func getDistInfo() string {
 func (info *Info) Install(ZigDIR string) {
 	info.download()
 	if info.IsMaster {
-		fmt.Printf("installing master => %s\n", info.Version)
+		fmt.Printf("installing master => %s...\n", info.Version)
 	} else {
-		fmt.Printf("installing %s\n", info.Version)
+		fmt.Printf("installing %s...\n", info.Version)
 	}
 
 	// Detect the format of the archive
@@ -154,5 +154,5 @@ func (info *Info) Install(ZigDIR string) {
 		os.RemoveAll(filepath.Join(ZigDIR, info.Version))
 		panic(err)
 	}
-	fmt.Printf("successfully installed\n")
+	fmt.Printf("successfully installed!\n")
 }

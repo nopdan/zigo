@@ -64,9 +64,9 @@ func (info *Info) download() {
 	// Check if the download did resume
 	if resp.DidResume {
 		resp.Wait()
-		fmt.Printf("Load cache from %s\n", info.FileName)
+		fmt.Printf("load cache from %s\n", info.FileName)
 	} else {
-		fmt.Printf("Downloading %v...\n", req.URL())
+		fmt.Printf("downloading %v...\n", req.URL())
 		for !resp.IsComplete() {
 			time.Sleep(100 * time.Millisecond)
 			progress(resp)
@@ -75,12 +75,12 @@ func (info *Info) download() {
 	}
 	// Check errors
 	if err := resp.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
+		fmt.Fprintf(os.Stderr, "download failed: %v\n", err)
 		os.Exit(1)
 	}
 
 	if !resp.DidResume {
-		fmt.Printf("Done. Save cache to %s\n", info.FileName)
+		fmt.Printf("done. save cache to %s\n", info.FileName)
 	}
 }
 
@@ -88,9 +88,9 @@ func progress(resp *grab.Response) {
 	bytesComplete := decor(float64(resp.BytesComplete()))
 	size := decor(float64(resp.Size()))
 	bps := resp.BytesPerSecond()
-	fmt.Printf("\rProgress:  %.1f%%   %s   %s/s",
-		resp.Progress()*100,
+	fmt.Printf("\rprogress:  %s  ( %.1f %% )  %s/s",
 		fmt.Sprintf("%s / %s", bytesComplete, size),
+		resp.Progress()*100,
 		decor(bps))
 }
 

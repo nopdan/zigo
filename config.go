@@ -147,11 +147,11 @@ func (c *Config) Install(version string) {
 
 	// Download and install to ZigDIR
 	info.Install(c.ZigDIR)
-	c.link(info.Version)
-	c.Current = version
 	if info.IsMaster {
 		c.Master = info.Version
 	}
+	c.link(info.Version)
+	c.Current = version
 	c.write()
 }
 
@@ -224,10 +224,16 @@ func (c *Config) remove(version string) {
 	dir := filepath.Join(c.ZigDIR, version)
 	// Handle the special case of removing the "master" version
 	if version == "master" {
+		if c.Master == "" {
+			return
+		}
 		dir = filepath.Join(c.ZigDIR, c.Master)
 		fmt.Printf("removing master => %s... ", c.Master)
-	} else {
+	} else if slices.Contains(c.versions(), version) {
 		fmt.Printf("removing %s... ", version)
+	} else {
+		fmt.Printf("version: %s not found\n", version)
+		os.Exit(1)
 	}
 	// Remove the directory
 	err := os.RemoveAll(dir)
