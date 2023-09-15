@@ -13,14 +13,33 @@ import (
 
 // Download a file from a given URL and verifies its integrity using SHA256 checksum.
 func (info *Info) download() {
+	// Create a new HTTP client for file downloading
 	client := grab.NewClient()
+
+	// Get the user's cache directory
 	dir, err := os.UserCacheDir()
 	if err != nil {
 		fmt.Printf("failed to get cache dir\n")
 		panic(err)
 	}
 	dir = filepath.Join(dir, "zigo")
-	req, err := grab.NewRequest(dir, info.URL)
+
+	// Check if the "zigo" directory exists
+	fi, err := os.Stat(dir)
+	if err != nil {
+		// Create the "zigo" directory if it doesn't exist
+		if os.IsNotExist(err) {
+			os.MkdirAll(dir, 0755)
+		} else {
+			panic(err)
+		}
+	} else if !fi.IsDir() {
+		// Remove the file with the same name if it exists
+		os.Remove(dir)
+		os.MkdirAll(dir, 0755)
+	}
+
+	req, err := grab.NewRequest(dir, info.URL) // Create a new download request
 	if err != nil {
 		fmt.Printf("failed to create request\n")
 		panic(err)
