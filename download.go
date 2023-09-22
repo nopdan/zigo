@@ -88,10 +88,12 @@ func progress(resp *grab.Response) {
 	bytesComplete := decor(float64(resp.BytesComplete()))
 	size := decor(float64(resp.Size()))
 	bps := resp.BytesPerSecond()
-	fmt.Printf("\rprogress:  %s  ( %.1f %% )  %s/s",
-		fmt.Sprintf("%s / %s", bytesComplete, size),
+	fmt.Printf("\rprogress: %s / %s | %.1f %% | %s/s %6s",
+		bytesComplete, size,
 		resp.Progress()*100,
-		decor(bps))
+		decor(bps),
+		" ", // extra space to prevent truncation
+	)
 }
 
 func decor(size float64) string {
