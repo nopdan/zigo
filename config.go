@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"slices"
@@ -92,7 +93,52 @@ func (c *Config) versions() []string {
 		}
 		ret = append(ret, f.Name())
 	}
+
+	// sort versions
+	slices.SortFunc(ret, cmpVersion)
+
 	return ret
+}
+
+// compare versions
+// 0.11.0
+// 0.12.0-dev.1127+32bc07767
+func cmpVersion(a, b string) int {
+	simp := func(s string) string {
+		// del "-dev"
+		s = strings.Replace(s, "-dev", "", 1)
+		// del hash
+		idx := strings.LastIndexByte(s, '+')
+		if idx != -1 {
+			s = s[:idx]
+		}
+		return s
+	}
+
+	parse := func(s string) [4]int {
+		s = simp(s)
+		var ver [4]int
+		sli := strings.Split(s, ".")
+		for i, v := range sli {
+			integer, _ := strconv.Atoi(v)
+			ver[i] = integer
+		}
+		return ver
+	}
+
+	verA := parse(a)
+	verB := parse(b)
+
+	for i := 0; i < 4; i++ {
+		if verA[i] < verB[i] {
+			return -1
+		}
+		if verA[i] > verB[i] {
+			return 1
+		}
+	}
+
+	return 0
 }
 
 // List prints the list of installed versions in the Config object.
