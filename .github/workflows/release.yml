@@ -1,0 +1,56 @@
+name: Release CI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # 拉取代码
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      # 安装 go
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.21.0"
+          check-latest: true
+
+      - name: Setup go cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+            ~/Library/Caches/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      # 编译
+      - name: Build
+        run: bash build.sh
+
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+          writeToFile: false
+          includeInvalidCommits: true
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/zigo-*.tar.gz,dist/zigo-*.zip"
+          body: |
+            ${{ steps.changelog.outputs.changes }}
+          token: ${{ secrets.GITHUB_TOKEN }}
