@@ -6,5 +6,5 @@
 *.dylib
 
 .vscode
-build/
 
+zigo*

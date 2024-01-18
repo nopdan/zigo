@@ -50,7 +50,7 @@ jobs:
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "dist/zigo-*.tar.gz,dist/zigo-*.zip"
+          artifacts: "zigo-*.tar.gz,zigo-*.zip"
           body: |
             ${{ steps.changelog.outputs.changes }}
           token: ${{ secrets.GITHUB_TOKEN }}
