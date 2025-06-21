@@ -17,7 +17,7 @@ Download and manage Zig compilers.
 - Download from [releases](https://github.com/nopdan/zigo/releases/).
 
 ```sh
-unzip ./zigo-linux-amd64.zip
+tar -zxvf ./zigo-linux-amd64.tar.gz
 chmod +x ./zigo
 ./zigo
 ```
@@ -28,6 +28,10 @@ Add `~/.zig/current` to the environment variable.
 
 ## Usage
 
+Set environment variable `ZIGO_PATH` to change compiler installation location.
+
+**default:** `~/.zig`
+
 ### `zigo <version>`
 
 Download the specified version of zig compiler and set it as default.
@@ -36,14 +40,19 @@ examples: `zigo 0.11.0`, `zigo master`
 
 ```sh
 ❯ ./zigo master
-downloading https://ziglang.org/builds/zig-linux-x86_64-0.12.0-dev.374+742030a8f.tar.xz...
-progress:  42.96 MiB / 42.96 MiB  ( 100.0 % )  13.96 MiB/s
-done. save cache to /home/cx/.cache/zigo/zig-linux-x86_64-0.12.0-dev.374+742030a8f.tar.xz
-installing master => 0.12.0-dev.374+742030a8f...
-successfully installed!
+Downloading zig-x86_64-windows-0.15.0-dev.864+75d0ec9c0.zip...
+url: https://ziglang.org/builds/zig-x86_64-windows-0.15.0-dev.864+75d0ec9c0.zip
+save to: C:\Users\Admin\AppData\Local\zigo\zig-x86_64-windows-0.15.0-dev.864+75d0ec9c0.zip
+progress: 88.90 MiB / 88.90 MiB | 100.0 % | 2.49 MiB/s         
+Done.
+Using master => 0.15.0-dev.864+75d0ec9c0
 ❯ zig version
 0.12.0-dev.374+742030a8f
 ```
+
+### `zigo fetch <version>`
+
+Download the specified version of zig compiler.
 
 ### `zigo use <version>`
 
@@ -67,16 +76,16 @@ Remove the specified compiler.
 
 Append `-f` or `--force` to force deletion.
 
-Use `zigo rm --all` or `zigo rm -a` to remove all installed compilers.
-
 ```sh
-❯ ./zigo rm 0.10.1
-removed 0.10.1
+❯ ./zigo rm 0.12.1
+Removing 0.12.1... 
+Done.
 
 ❯ ./zigo rm 0.11.0
-cannot remove the version you are using.
+Cannot remove the version you are using.
 ❯ ./zigo rm 0.11.0 -f
-removing 0.11.0... done.
+Removing 0.11.0... 
+Done.
 ```
 
 ### `zigo clean`
@@ -91,19 +100,14 @@ Clean up unused dev version compilers.
   0.12.0-dev.352+4d29b3967
   0.12.0-dev.353+4a44b7993
 ❯ ./zigo clean
-removed 0.12.0-dev.312+cb6201715
-removed 0.12.0-dev.352+4d29b3967
+Removing 0.12.0-dev.312+cb6201715...
+Removing 0.12.0-dev.352+4d29b3967...
+Done.
 ❯ ./zigo ls
 * master => 0.12.0-dev.353+4a44b7993
   0.11.0
   0.12.0-dev.353+4a44b7993
 ```
-
-### `zigo mv <install-dir>`
-
-Move the zig installation directory.
-
-**Default installation directory is** `~/.zig`.
 
 ### `zigo -h`
 

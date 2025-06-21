@@ -6,53 +6,33 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/cavaliergopher/grab/v3"
 )
 
 // Download a file from a given URL and verifies its integrity using SHA256 checksum.
-func (info *Info) download() {
+func download(url, checksum string) string {
 	// Create a new HTTP client for file downloading
 	client := grab.NewClient()
 
-	// Get the user's cache directory
-	dir, err := os.UserCacheDir()
-	if err != nil {
-		fmt.Printf("failed to get cache dir\n")
-		panic(err)
-	}
-	dir = filepath.Join(dir, "zigo")
-
-	// Check if the "zigo" directory exists
-	fi, err := os.Stat(dir)
-	if err != nil {
-		// Create the "zigo" directory if it doesn't exist
-		if os.IsNotExist(err) {
-			os.MkdirAll(dir, 0755)
-		} else {
-			panic(err)
-		}
-	} else if !fi.IsDir() {
-		// Remove the file with the same name if it exists
-		os.Remove(dir)
-		os.MkdirAll(dir, 0755)
-	}
+	tmp := strings.Split(url, "/")
+	filename := tmp[len(tmp)-1]
+	name := filepath.Join(cacheDir, filename)
 
 	// Create a new download request
-	req, err := grab.NewRequest(dir, info.URL)
+	req, err := grab.NewRequest(name, url)
 	if err != nil {
-		fmt.Printf("failed to create request\n")
-		panic(err)
+		p.Errorf("Failed to create download request: %s\n", err)
+		os.Exit(1)
 	}
 
 	// Verify sha256 checksum
-	if info.Shasum != "" {
+	if checksum != "" {
 		h := sha256.New()
-		sum, err := hex.DecodeString(info.Shasum)
-		if err != nil {
-			fmt.Printf("failed to decode sha256 checksum\n")
-		} else {
+		sum, err := hex.DecodeString(checksum)
+		if err == nil {
 			req.SetChecksum(h, sum, true)
 		}
 	}
@@ -60,28 +40,28 @@ func (info *Info) download() {
 	// Start download
 	resp := client.Do(req)
 
-	info.FileName = resp.Filename
-	// Check if the download did resume
-	if resp.DidResume {
-		resp.Wait()
-		fmt.Printf("load cache from %s\n", info.FileName)
-	} else {
-		fmt.Printf("downloading... %v\n", req.URL())
-		for !resp.IsComplete() {
-			time.Sleep(100 * time.Millisecond)
-			progress(resp)
-		}
-		fmt.Println()
+	if resp.IsComplete() {
+		cInfo.Printf("Load cache from %s\n", name)
+		return name
 	}
+
+	cInfo.Printf("Downloading %s...\n", filename)
+	fmt.Printf("url: %s\n", url)
+	fmt.Printf("save to: %s\n", name)
+	for !resp.IsComplete() {
+		time.Sleep(100 * time.Millisecond)
+		progress(resp)
+	}
+	fmt.Println()
+
 	// Check errors
 	if err := resp.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "download failed: %v\n", err)
+		p.Errorf("Failed to download file: %s\n", err)
 		os.Exit(1)
 	}
 
-	if !resp.DidResume {
-		fmt.Printf("done. save cache to %s\n", info.FileName)
-	}
+	cInfo.Println("Done.")
+	return name
 }
 
 func progress(resp *grab.Response) {
