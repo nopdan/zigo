@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+const version = "2.0.1"
+
 func main() {
 	if len(os.Args) == 1 {
 		help()

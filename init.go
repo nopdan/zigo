@@ -67,8 +67,6 @@ func modifyConfig() {
 }
 
 var (
-	// Version is the current version of the program.
-	version  = "2.0.0"
 	distInfo = getDistInfo()
 	cacheDir = getCacheDir()
 )

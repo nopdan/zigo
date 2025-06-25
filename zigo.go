@@ -125,14 +125,12 @@ func List() {
 
 // Set the specific installed version as default
 func Use(version string) {
-	// Check if the specified version is the current version
-	if version == current {
-		return
-	}
-
 	isMaster := version == "master"
 	if isMaster {
 		version = master
+	} else if version == current {
+		// Check if the specified version is the current version
+		return
 	}
 
 	// Check if the specified version is in the list of available versions
